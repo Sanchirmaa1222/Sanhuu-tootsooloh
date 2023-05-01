@@ -67,6 +67,13 @@ var financeController = (function () {
     this.description = description;
     this.value = value;
   };
+  var calculateTotal = function (type) {
+    var sum = 0;
+    data.items[type].forEach(function (el) {
+      sum = sum + [el.value];
+    });
+    data.totals[type] = sum;
+  };
 
   // private data
   var data = {
@@ -79,9 +86,31 @@ var financeController = (function () {
       inc: 0,
       exp: 0,
     },
+    tusuv: 0,
+
+    huvi: 0,
   };
 
   return {
+    tusuvTootsooloh: function () {
+      // niit orlogiin niilber tootsooloh
+      calculateTotal("inc");
+      // niit zarlagiin niilberiig todorhoiloh
+      calculateTotal("exp");
+      //niit orlogoos niit zarlagiig hasch odo bga tusuv todorhoiloh
+      data.tusuv = parseInt(data.totals.inc - data.totals.exp);
+      //orlogo zarlagiin huwiig tootsooloh
+      data.huvi = Math.round((data.totals.exp / data.totals.inc) * 100);
+    },
+
+    tusviigAvah: function () {
+      return {
+        tusuv: data.tusuv,
+        huvi: data.huvi,
+        totalInc: data.totals.inc,
+        totalExp: data.totals.exp,
+      };
+    },
     addItem: function (type, desc, val) {
       var item, id;
 
@@ -125,7 +154,12 @@ var appController = (function (uiController, financeController) {
 
       // console.log(financeController.seeData());
       // 4. Төсвийг тооцоолно
-      // 5. Эцсийн үлдэгдэл, тооцоог дэлгэцэнд гаргана.
+      financeController.tusuvTootsooloh();
+      // 5. Эцсийн үлдэгдэл
+      var tusuv = financeController.tusviigAvah();
+
+      //  6. Төсвийн тооцоог дэлгэцэнд гаргана.
+      console.log(tusuv);
     }
   };
 
